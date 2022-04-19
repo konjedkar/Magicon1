@@ -915,7 +915,11 @@ void setfloormask(unsigned char floormasked,unsigned char floorcond,unsigned cha
              case 2:
              SecondDoor[sfm4] &= sfm3; 
              EE_SecondDoor[sfm4] = SecondDoor[sfm4];  
-             break;                          
+             break;     
+             case 3:
+             HalfFloor[sfm4] &= sfm3; 
+             EE_HalfFloor[sfm4] = HalfFloor[sfm4];  
+             break;                                    
             }
            delay_ms(1);
          }
@@ -941,16 +945,34 @@ void setfloormask(unsigned char floormasked,unsigned char floorcond,unsigned cha
              case 2:
                SecondDoor[sfm4] |= sfm3;           
                EE_SecondDoor[sfm4] = SecondDoor[sfm4]; 
-             break;                          
+             break;  
+             case 3:
+               HalfFloor[sfm4] |= sfm3;           
+               EE_HalfFloor[sfm4] = HalfFloor[sfm4]; 
+             break;                                        
             }             
-           
  
            delay_ms(1);
          }
   
   
-}                          
-          
+} 
+
+
+                         
+unsigned char halffloorstatus(unsigned char floorvalid)
+{                 
+  unsigned char hfs1=0,hfs2=0,hfs3,hfs4;   
+  hfs1 = floorvalid % 8  ;
+  if(!hfs1)hfs1=8; 
+  hfs1--;   
+  
+  hfs4= (floorvalid - 1) / 8;
+  
+  hfs2 = HalfFloor[hfs4];
+  if(!((hfs2>>hfs1) & 0x01))return 0; 
+     else return 1;   
+}
 
 
 char Waiting_List_Manager(unsigned char  Request_number,unsigned char  Request_type
@@ -1136,7 +1158,7 @@ if(action=='f')  //find
                                    pc2 = WL[i].Req % 8;
                                    if(!pc2)pc2=8;
                                    pc2 *= 2;
-                                   if(WL[i].ReqType == 2)pc2--;
+                                   if(WL[i].ReqType == 4)pc2--;          //2
                                       
                                    sep_id.dest_address = 0xF0 + pc1; 
                                    ID = assemble_id(sep_id); 
@@ -1214,7 +1236,7 @@ if(action=='f')  //find
                                    pc2 = WL[i].Req % 8;
                                    if(!pc2)pc2=8;
                                    pc2 *= 2;
-                                   if(WL[i].ReqType == 2)pc2--;
+                                   if(WL[i].ReqType == 4)pc2--;    //2
                                       
                                    serial_current_message.length = 2;
                                    serial_current_message.source = node_address;    
